@@ -183,13 +183,13 @@ const getNoticeRecipients = async () => {
 };
 
 const addNoticeRecipient = async (payload) => {
-  const { roleId, primaryDependentName, primaryDependentSelect } = payload;
+  const { roleId, primaryDependentName, primaryDependentSelect, description } = payload;
   const query = `
         INSERT INTO notice_recipient_types
-            (role_id, primary_dependent_name, primary_dependent_select)
-        VALUES ($1, $2, $3)
+            (role_id, primary_dependent_name, primary_dependent_select, description)
+        VALUES ($1, $2, $3, $4)
     `;
-  const queryParams = [roleId, primaryDependentName, primaryDependentSelect];
+  const queryParams = [roleId, primaryDependentName, primaryDependentSelect, description];
   const { rowCount } = await processDBRequest({ query, queryParams });
   return rowCount;
 };
