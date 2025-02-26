@@ -34,11 +34,16 @@ const EMAIL_NOT_VERIFIED =
 const USER_ALREADY_ACTIVE = "User already in active status. Please login.";
 const UNABLE_TO_VERIFY_EMAIL = "Unable to verify email";
 const login = async (username, passwordFromUser) => {
-  const client = await db.connect();
+  const client = await db.connect().catch((err) => {
+    console.error("Failed to connect to the database:", err);
+    throw new ApiError(500, "Database connection failed");
+  });
+
   try {
     await client.query("BEGIN");
 
     const user = await findUserByUsername(username, client);
+    console.log("User found:", user);
     if (!user) {
       throw new ApiError(400, "Invalid credential");
     }
@@ -55,6 +60,8 @@ const login = async (username, passwordFromUser) => {
       throw new ApiError(403, "Your account is disabled");
     }
 
+    console.log("Password from DB:", passwordFromDB);
+    console.log("Password from user:", passwordFromUser);
     await verifyPassword(passwordFromDB, passwordFromUser);
 
     const roleName = await getRoleNameByRoleId(role_id, client);
@@ -65,18 +72,30 @@ const login = async (username, passwordFromUser) => {
       env.JWT_ACCESS_TOKEN_SECRET,
       env.JWT_ACCESS_TOKEN_TIME_IN_MS
     );
+    console.log("Access Token:", accessToken);
+
     const refreshToken = generateToken(
       { id: userId, role: roleName, roleId: role_id },
       env.JWT_REFRESH_TOKEN_SECRET,
       env.JWT_REFRESH_TOKEN_TIME_IN_MS
     );
+    console.log("Refresh Token:", refreshToken);
 
+    console.log("Deleting old refresh tokens for user:", userId);
     await deleteOldRefreshTokenByUserId(userId, client);
+
+    console.log("Inserting new refresh token for user:", userId);
     await insertRefreshToken({ userId, refreshToken }, client);
+
+    console.log("Saving last login date for user:", userId);
     await saveUserLastLoginDate(userId, client);
 
+    console.log("Fetching permissions for role:", role_id);
     const permissions = await getMenusByRoleId(role_id, client);
+    console.log("Permissions:", permissions);
+
     const { hierarchialMenus, apis, uis } = formatMyPermission(permissions);
+    console.log("Formatted permissions:", { hierarchialMenus, apis, uis });
 
     await client.query("COMMIT");
 
@@ -92,6 +111,7 @@ const login = async (username, passwordFromUser) => {
 
     return { accessToken, refreshToken, csrfToken, accountBasic };
   } catch (error) {
+    console.error("Transaction error:", error);
     await client.query("ROLLBACK");
     throw error;
   } finally {

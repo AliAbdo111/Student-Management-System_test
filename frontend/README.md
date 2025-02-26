@@ -79,11 +79,11 @@ src
     +-- style.css
 ```
 
-## State management
+    ## State management
 
-Component's own state are managed by the `useState` and `useReducer` hooks.
+    Component's own state are managed by the `useState` and `useReducer` hooks.
 
-As the requirement of app grows, `redux-toolkit` is used for global store and `redux-persist` for store state persistence. `redux tookit query` has been a really game changer in the RTK family which has some really cool feature regarding auto hooks for the endpoints too.
+    As the requirement of app grows, `redux-toolkit` is used for global store and `redux-persist` for store state persistence. `redux tookit query` has been a really game changer in the RTK family which has some really cool feature regarding auto hooks for the endpoints too.
 
 **Form handling**
 

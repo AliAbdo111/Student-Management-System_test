@@ -44,10 +44,13 @@ const findAllStudents = async (payload) => {
 }
 
 const addOrUpdateStudent = async (payload) => {
-    const query = "SELECT * FROM student_add_update($1)";
-    const queryParams = [payload];
-    const { rows } = await processDBRequest({ query, queryParams });
-    return rows[0];
+    try {
+        const { rows } = await processDBRequest({ query, queryParams });
+        return rows[0];
+      } catch (error) {
+        console.error("Database request failed:", error);
+        throw new Error("Failed to add or update student");
+      }
 }
 
 const findStudentDetail = async (id) => {

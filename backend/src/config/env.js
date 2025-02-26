@@ -1,7 +1,7 @@
 
 const env = {
   PORT: process.env.PORT,
-  DATABASE_URL: process.env.DATABASE_URL,
+  DATABASE_URL: 'postgresql://postgres:root@localhost:5432/student_management',
   JWT_ACCESS_TOKEN_SECRET: process.env.JWT_ACCESS_TOKEN_SECRET,
   JWT_REFRESH_TOKEN_SECRET: process.env.JWT_REFRESH_TOKEN_SECRET,
   CSRF_TOKEN_SECRET: process.env.CSRF_TOKEN_SECRET,
